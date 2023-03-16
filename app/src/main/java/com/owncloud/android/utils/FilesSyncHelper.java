@@ -48,15 +48,8 @@ import com.owncloud.android.db.OCUpload;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
-import org.lukhnos.nnio.file.FileVisitResult;
-import org.lukhnos.nnio.file.Files;
-import org.lukhnos.nnio.file.Path;
-import org.lukhnos.nnio.file.Paths;
-import org.lukhnos.nnio.file.SimpleFileVisitor;
-import org.lukhnos.nnio.file.attribute.BasicFileAttributes;
 
 import java.io.File;
-import java.io.IOException;
 
 import static com.owncloud.android.datamodel.OCFile.PATH_SEPARATOR;
 
@@ -93,31 +86,48 @@ public final class FilesSyncHelper {
                 FilesSyncHelper.insertContentIntoDB(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                                                     syncedFolder);
             } else {
-                try {
-                    FilesystemDataProvider filesystemDataProvider = new FilesystemDataProvider(contentResolver);
-                    Path path = Paths.get(syncedFolder.getLocalPath());
-
-                    Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                        @Override
-                        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-                            File file = path.toFile();
-                            if (syncedFolder.isExisting() || attrs.lastModifiedTime().toMillis() >= enabledTimestampMs) {
-                                filesystemDataProvider.storeOrUpdateFileValue(path.toAbsolutePath().toString(),
-                                                                              attrs.lastModifiedTime().toMillis(),
-                                                                              file.isDirectory(), syncedFolder);
-                            }
-
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult visitFileFailed(Path file, IOException exc) {
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
-                } catch (IOException e) {
-                    Log_OC.e(TAG, "Something went wrong while indexing files for auto upload", e);
+                FilesystemDataProvider filesystemDataProvider = new FilesystemDataProvider(contentResolver);
+                File syncFolder = new File(syncedFolder.getLocalPath());
+                if(!syncFolder.isDirectory()){
+                    Log_OC.e(TAG,"Directory "+syncFolder.getAbsolutePath()+" to be synced is not a directory");
+                    return;
                 }
+                if(!syncFolder.canRead()){
+                    Log_OC.e(TAG,"Cannot read directory "+syncFolder.getAbsolutePath()+
+                        " to be synced (no permissions)");
+                    return;
+                }
+                //recursively add each file and folder to sync database
+                directoryWalkerHelper(syncFolder,
+                                      syncedFolder.isExisting(), enabledTimestampMs,
+                                      filesystemDataProvider,
+                                      syncedFolder);
+            }
+        }
+    }
+
+    private static void directoryWalkerHelper(File file,
+                                              boolean doExistingFiles,
+                                              long enabledTimestampMs,
+                                              FilesystemDataProvider provider,
+                                              SyncedFolder rootSyncedFolder){
+        if(!file.canRead()){
+            Log_OC.e(TAG,"Cannot read directory/file: "+file.getAbsolutePath()+" (no permissions maybe?)");
+            return;
+        }
+        if (doExistingFiles || file.lastModified() >= enabledTimestampMs) {
+                provider.storeOrUpdateFileValue(file.getAbsolutePath(),
+                                                file.lastModified(),
+                                                file.isDirectory(), rootSyncedFolder);
+        }
+        if(file.isDirectory()){
+            File[] fileList = file.listFiles();
+            if(fileList == null){
+                Log_OC.e(TAG,"Listing files in current directory "+file.getAbsolutePath()+ "returned null");
+                return;
+            }
+            for(File f: fileList){
+                directoryWalkerHelper(f, doExistingFiles, enabledTimestampMs, provider, rootSyncedFolder);
             }
         }
     }
