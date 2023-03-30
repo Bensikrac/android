@@ -25,6 +25,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import com.nextcloud.client.account.MockUser;
 import com.nextcloud.client.core.Clock;
+import com.nextcloud.client.core.ClockImpl;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.MainApp;
@@ -51,13 +52,12 @@ import java.util.Set;
 import static org.junit.Assert.fail;
 
 public class FilesSyncHelperTest extends AbstractIT{
-    @Mock AppPreferences preferences;
-    @Mock Clock clock;
+    @Mock private AppPreferences preferences;
+    private Clock clock;
 
     @Before
     public void init(){
-        this.clock = Mockito.mock(Clock.class);
-        Mockito.when(clock.getCurrentTime()).thenReturn(0L);
+        this.clock = new ClockImpl();
     }
     @SuppressWarnings("ResultOfMethodCallIgnored") //file creation / deletion
     @Test
@@ -166,11 +166,11 @@ public class FilesSyncHelperTest extends AbstractIT{
                     } else {
                         File file = new File(value);
                         if (!file.exists()) {
-                            Log_OC.d("FilesSyncHelper","Ignoring file for upload (doesn't exist): " + value);
+                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (doesn't exist): " + value);
                         } else if (!SyncedFolderUtils.isQualifiedFolder(file.getParent())) {
-                            Log_OC.d("FilesSyncHelper","Ignoring file for upload (unqualified folder): " + value);
+                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (unqualified folder): " + value);
                         } else if (!SyncedFolderUtils.isFileNameQualifiedForAutoUpload(file.getName())) {
-                            Log_OC.d("FilesSyncHelper","Ignoring file for upload (unqualified file): " + value);
+                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (unqualified file): " + value);
                         } else {
                             filesInDB.add(value);
                         }
