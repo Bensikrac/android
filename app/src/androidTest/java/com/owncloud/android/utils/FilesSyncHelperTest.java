@@ -182,6 +182,11 @@ public class FilesSyncHelperTest extends AbstractIT{
             cursor.close();
         }
         if(!filesInDB.containsAll(neededPaths)){
+            for(String needed: neededPaths){
+                if(!filesInDB.contains(needed)){
+                    fail("File "+needed+ " not found in database");
+                }
+            }
             fail("Not all files from synced folder are correctly in database");
         }
 
