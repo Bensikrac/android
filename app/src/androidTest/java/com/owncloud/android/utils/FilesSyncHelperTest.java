@@ -64,31 +64,32 @@ public class FilesSyncHelperTest extends AbstractIT{
     public void testInsertAllDBEntries(){ //Warning: this only tests for non-media folders
         List<String> neededPaths = new LinkedList<>();
 
-        String fileRoot = "/storage/emulated/0"; //replace this if test don't work
+        String fileRoot = "/storage/emulated/0/nextcloudTest"; //replace this if test don't work
         try{
-            File root = new File(fileRoot+"/nextcloudTest");
+            File root = new File(fileRoot);
             root.mkdir();
-            new File(fileRoot+"/nextcloudTest/images").mkdir();
-            new File(fileRoot+"/nextcloudTest/videos").mkdir();
-            new File(fileRoot+"/nextcloudTest/other").mkdir();
-            neededPaths.add(fileRoot+"/nextcloudTest/other");
+            new File(fileRoot+"/images").mkdir();
+            new File(fileRoot+"/videos").mkdir();
+            new File(fileRoot+"/other").mkdir();
+            neededPaths.add(fileRoot+"/other");
             //add sample elements to file
-            File image1 = new File(fileRoot+"/nextcloudTest/images/img1.png");
+            File image1 = new File(fileRoot+"/images/img1.png");
             image1.createNewFile();
-            File video1 = new File(fileRoot+"/nextcloudTest/videos/vid1.mp4");
+            File video1 = new File(fileRoot+"/videos/vid1.mp4");
             video1.createNewFile();
-            File other1 = new File(fileRoot+"/nextcloudTest/other/other1.txt");
+            File other1 = new File(fileRoot+"/other/other1.txt");
             other1.createNewFile();
-            neededPaths.add(fileRoot+"/nextcloudTest/other/other1.txt");
-            StringBuilder nestedpath = new StringBuilder(fileRoot + "/nextcloudTest/other");
+            neededPaths.add(fileRoot+"/other/other1.txt");
+            StringBuilder nestedPath = new StringBuilder(fileRoot);
+            nestedPath.append("/other");
             for(int i = 0; i < 10; i++){
-                File add = new File(nestedpath+"/file"+i);
+                File add = new File(nestedPath+"/file"+i);
                 add.createNewFile();
                 neededPaths.add(add.getAbsolutePath());
-                File directory = new File(nestedpath+"/d"+i);
+                File directory = new File(nestedPath+"/d"+i);
                 neededPaths.add(directory.getAbsolutePath());
                 directory.mkdir();
-                nestedpath.append("/d").append(i);
+                nestedPath.append("/d").append(i);
             }
         }catch (IOException e){
             fail("Unable to create Test files: "+e);
@@ -101,7 +102,7 @@ public class FilesSyncHelperTest extends AbstractIT{
             false,
             true,
             false,
-            "FilesSyncHelperTest",
+            TAG,
             FileUploader.LOCAL_BEHAVIOUR_FORGET,
             NameCollisionPolicy.OVERWRITE.serialize(),
             true,
@@ -116,7 +117,7 @@ public class FilesSyncHelperTest extends AbstractIT{
             false,
             true,
             false,
-            "FilesSyncHelperTest",
+            TAG,
             FileUploader.LOCAL_BEHAVIOUR_FORGET,
             NameCollisionPolicy.OVERWRITE.serialize(),
             true,
@@ -124,6 +125,7 @@ public class FilesSyncHelperTest extends AbstractIT{
             MediaFolderType.VIDEO,
             false
         );*/
+        String TAG = "FilesSyncHelperTest";
         SyncedFolder other = new SyncedFolder(
             fileRoot+"/nextcloudTest/other",
             "/testing/images",
@@ -131,7 +133,7 @@ public class FilesSyncHelperTest extends AbstractIT{
             false,
             true,
             false,
-            "FilesSyncHelperTest",
+            TAG,
             FileUploader.LOCAL_BEHAVIOUR_FORGET,
             NameCollisionPolicy.OVERWRITE.serialize(),
             true,
@@ -166,11 +168,11 @@ public class FilesSyncHelperTest extends AbstractIT{
                     } else {
                         File file = new File(value);
                         if (!file.exists()) {
-                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (doesn't exist): " + value);
+                            Log_OC.d(TAG, "Ignoring file for upload (doesn't exist): " + value);
                         } else if (!SyncedFolderUtils.isQualifiedFolder(file.getParent())) {
-                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (unqualified folder): " + value);
+                            Log_OC.d(TAG, "Ignoring file for upload (unqualified folder): " + value);
                         } else if (!SyncedFolderUtils.isFileNameQualifiedForAutoUpload(file.getName())) {
-                            Log_OC.d("FilesSyncHelperTest","Ignoring file for upload (unqualified file): " + value);
+                            Log_OC.d(TAG, "Ignoring file for upload (unqualified file): " + value);
                         } else {
                             filesInDB.add(value);
                         }
@@ -184,7 +186,7 @@ public class FilesSyncHelperTest extends AbstractIT{
         }
 
         //cleanup (I don't know if it is done automatically, so I do it myself)
-        provider.deleteSyncFoldersForAccount(new MockUser("FilesSyncHelperTest",MockUser.DEFAULT_MOCK_ACCOUNT_TYPE));
+        provider.deleteSyncFoldersForAccount(new MockUser(TAG, MockUser.DEFAULT_MOCK_ACCOUNT_TYPE));
         Collections.reverse(neededPaths); //delete in reverse
         for(String path: neededPaths){
             new File(path).delete();
