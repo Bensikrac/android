@@ -410,6 +410,8 @@
         <activity
             android:name=".ui.activity.UploadListActivity"
             android:exported="false" />
+        <activity android:name=".ui.activity.BiDirectionalFileSyncActivity"
+            android:exported="false"/>
         <activity
             android:name=".ui.trashbin.TrashbinActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
