@@ -20,7 +20,64 @@
  */
 package com.owncloud.android.ui.activity;
 
-public class BiDirectionalFileSyncActivity extends FileActivity {
+import android.os.Bundle;
+import android.view.MenuItem;
+import com.owncloud.android.R;
+import com.owncloud.android.databinding.BidirectionalFilesSyncLayoutBinding;
+
+/**
+ * Activity allowing creation, editing and deleting bidirectionally synced folders. Also shows sync log
+ * //TODO add content manager for this, since this is only gui
+ */
+public class BiDirectionalFileSyncActivity extends DrawerActivity {
+
+    private static final String TAG = BiDirectionalFileSyncActivity.class.getSimpleName();
+    private BidirectionalFilesSyncLayoutBinding binding;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) { //handles element setup for GUI
+        super.onCreate(savedInstanceState);
+
+
+        //setup view: Add binding first
+        binding = BidirectionalFilesSyncLayoutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        
+        //then setup toolbar (handled by super class)
+        setupToolbar();
+        //Toolbar title
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.bidirectional_sync_menu_option));
+        //left drawer
+        setupDrawer(R.id.nav_bidirectional);
+        //finally all content
+        setupContent();
+    }
+
+    @Override
+    protected void onResume() { //when app is resumed or reopened
+        super.onResume();
+        setDrawerMenuItemChecked(R.id.nav_bidirectional);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { //handles hamburger button on left
+        boolean retval = true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            if (isDrawerOpen()) {
+                closeDrawer();
+            } else {
+                openDrawer();
+            }
+        } else {
+            retval = super.onOptionsItemSelected(item);
+        }
+        return retval;
+    }
+
+    private void setupContent(){
+
+    }
 
 
 }

@@ -51,6 +51,7 @@ import com.owncloud.android.services.OperationsService;
 import com.owncloud.android.syncadapter.FileSyncService;
 import com.owncloud.android.ui.activities.ActivitiesActivity;
 import com.owncloud.android.ui.activity.BaseActivity;
+import com.owncloud.android.ui.activity.BiDirectionalFileSyncActivity;
 import com.owncloud.android.ui.activity.CommunityActivity;
 import com.owncloud.android.ui.activity.ConflictsResolveActivity;
 import com.owncloud.android.ui.activity.ContactsPreferenceActivity;
@@ -226,6 +227,9 @@ abstract class ComponentsModule {
 
     @ContributesAndroidInjector
     abstract UploadListActivity uploadListActivity();
+
+    @ContributesAndroidInjector
+    abstract BiDirectionalFileSyncActivity biDirectionalFileSyncActivity();
 
     @ContributesAndroidInjector
     abstract UserInfoActivity userInfoActivity();
