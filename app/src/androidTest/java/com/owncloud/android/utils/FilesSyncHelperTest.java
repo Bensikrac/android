@@ -64,7 +64,7 @@ public class FilesSyncHelperTest extends AbstractIT{
     public void testInsertAllDBEntries(){ //Warning: this only tests for non-media folders
         List<String> neededPaths = new LinkedList<>();
 
-        String fileRoot = "/storage/emulated/0/nextcloudTest"; //replace this if test don't work
+        String fileRoot = targetContext.getFilesDir() + "/nextcloudTest"; //create a subfolder in file root for files
         try{
             File root = new File(fileRoot);
             root.mkdir();
@@ -181,13 +181,14 @@ public class FilesSyncHelperTest extends AbstractIT{
             }
             cursor.close();
         }
+        List<String> missingFiles = new LinkedList<>();
         if(!filesInDB.containsAll(neededPaths)){
             for(String needed: neededPaths){
                 if(!filesInDB.contains(needed)){
-                    fail("File "+needed+ " not found in database");
+                    missingFiles.add("File "+needed+ " not found in database");
                 }
             }
-            fail("Not all files from synced folder are correctly in database");
+            fail("Not all files from synced folder are correctly in database" + missingFiles.stream().reduce(String::concat));
         }
 
         //cleanup (I don't know if it is done automatically, so I do it myself)
