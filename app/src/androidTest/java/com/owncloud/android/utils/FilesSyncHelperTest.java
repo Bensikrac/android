@@ -63,8 +63,8 @@ public class FilesSyncHelperTest extends AbstractIT{
     @Test
     public void testInsertAllDBEntries(){ //Warning: this only tests for non-media folders
         List<String> neededPaths = new LinkedList<>();
-
-        String fileRoot = targetContext.getFilesDir() + "/nextcloudTest"; //create a subfolder in file root for files
+        String testFolder = "/filessynchelpertestdir";
+        String fileRoot = targetContext.getFilesDir() + testFolder; //create a subfolder in file root for files
         try{
             File root = new File(fileRoot);
             root.mkdir();
@@ -96,7 +96,7 @@ public class FilesSyncHelperTest extends AbstractIT{
         }
 
         /*SyncedFolder images = new SyncedFolder(
-            fileRoot+"/nextcloudTest/images",
+            fileRoot+testFolder+"/images",
             "/testing/images",
             false,
             false,
@@ -111,7 +111,7 @@ public class FilesSyncHelperTest extends AbstractIT{
             false
         );
         SyncedFolder videos = new SyncedFolder(
-            fileRoot+"/nextcloudTest/videos",
+            fileRoot+testFolder+"/videos",
             "/testing/images",
             false,
             false,
@@ -127,7 +127,7 @@ public class FilesSyncHelperTest extends AbstractIT{
         );*/
         String TAG = "FilesSyncHelperTest";
         SyncedFolder other = new SyncedFolder(
-            fileRoot+"/nextcloudTest/other",
+            fileRoot+ testFolder + "/other",
             "/testing/images",
             false,
             false,
@@ -197,12 +197,12 @@ public class FilesSyncHelperTest extends AbstractIT{
         for(String path: neededPaths){
             new File(path).delete();
         }
-        new File(fileRoot+"/nextcloudTest/images/img1.png").delete();
-        new File(fileRoot+"/nextcloudTest/videos/vid1.mp4").delete();
-        new File(fileRoot+"/nextcloudTest/other/other1.txt").delete();
-        new File(fileRoot+"/nextcloudTest/images").delete();
-        new File(fileRoot+"/nextcloudTest/videos").delete();
-        new File(fileRoot+"/nextcloudTest/other").delete();
-        new File(fileRoot+"/nextcloudTest").delete();
+        new File(fileRoot+testFolder+"/images/img1.png").delete();
+        new File(fileRoot+testFolder+"/videos/vid1.mp4").delete();
+        new File(fileRoot+testFolder+"/other/other1.txt").delete();
+        new File(fileRoot+testFolder+"/images").delete();
+        new File(fileRoot+testFolder+"/videos").delete();
+        new File(fileRoot+testFolder+"/other").delete();
+        new File(fileRoot+testFolder).delete();
     }
 }
