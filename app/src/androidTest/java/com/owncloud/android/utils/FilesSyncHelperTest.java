@@ -49,6 +49,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class FilesSyncHelperTest extends AbstractIT{
@@ -67,7 +69,7 @@ public class FilesSyncHelperTest extends AbstractIT{
         String fileRoot = targetContext.getFilesDir() + testFolder; //create a subfolder in file root for files
         try{
             File root = new File(fileRoot);
-            root.mkdir();
+            assertTrue("Could not create testing directory "+ root.getAbsolutePath(), root.mkdir());
             new File(fileRoot+"/images").mkdir();
             new File(fileRoot+"/videos").mkdir();
             new File(fileRoot+"/other").mkdir();
@@ -84,47 +86,16 @@ public class FilesSyncHelperTest extends AbstractIT{
             nestedPath.append("/other");
             for(int i = 0; i < 10; i++){
                 File add = new File(nestedPath+"/file"+i);
-                add.createNewFile();
+                assertTrue("Could not create test file "+ add.getAbsolutePath(), add.createNewFile());
                 neededPaths.add(add.getAbsolutePath());
                 File directory = new File(nestedPath+"/d"+i);
                 neededPaths.add(directory.getAbsolutePath());
-                directory.mkdir();
+                assertTrue("Could not create testing directory "+ directory.getAbsolutePath(), directory.mkdir());
                 nestedPath.append("/d").append(i);
             }
-        }catch (IOException e){
+        }catch (Exception e){
             fail("Unable to create Test files: "+e);
         }
-
-        /*SyncedFolder images = new SyncedFolder(
-            fileRoot+testFolder+"/images",
-            "/testing/images",
-            false,
-            false,
-            true,
-            false,
-            TAG,
-            FileUploader.LOCAL_BEHAVIOUR_FORGET,
-            NameCollisionPolicy.OVERWRITE.serialize(),
-            true,
-            0L,
-            MediaFolderType.IMAGE,
-            false
-        );
-        SyncedFolder videos = new SyncedFolder(
-            fileRoot+testFolder+"/videos",
-            "/testing/images",
-            false,
-            false,
-            true,
-            false,
-            TAG,
-            FileUploader.LOCAL_BEHAVIOUR_FORGET,
-            NameCollisionPolicy.OVERWRITE.serialize(),
-            true,
-            0L,
-            MediaFolderType.VIDEO,
-            false
-        );*/
         String TAG = "FilesSyncHelperTest";
         SyncedFolder other = new SyncedFolder(
             fileRoot+ testFolder + "/other",
@@ -142,8 +113,6 @@ public class FilesSyncHelperTest extends AbstractIT{
             false
         );
         SyncedFolderProvider provider = new SyncedFolderProvider(MainApp.getAppContext().getContentResolver(),preferences,clock);
-        //provider.storeSyncedFolder(images);
-        //provider.storeSyncedFolder(videos);
         provider.storeSyncedFolder(other);
 
         //Execute Test
